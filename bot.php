@@ -13,10 +13,11 @@ while (!preg_match("/:\S+ 376 \S+ :.*/i", $read)) {
 foreach($channels as $num => $chan) {
 	fwrite($fp, "JOIN $chan\r\n");
 }
+fwrite("CAP REQ :twitch.tv/commands");
+stream_set_timeout($fp, 1);
 echo "Bot started successfuly!\n";
 while (TRUE){
         $read = fgets($fp);
-		//echo "(".date("H:i:s").") ".implode(' | ', stream_get_meta_data($fp))."\n";
 		echo "(".date("H:i:s").") ";
 		print_r(stream_get_meta_data($fp));
 		echo "\n";
@@ -41,6 +42,8 @@ while (TRUE){
             fwrite($fp, "PONG :tmi.twitch.tv\r\n");
             echo "(".date("H:i:s").") Bot reconnected!\n";
         }
+		if (!feof($fp)) continue;
+        sleep(1);
     }
 function user_joined($nick, $chan) {
 	global $users;
@@ -56,6 +59,10 @@ function user_parted($nick, $chan) {
 }
 function jtv_error($msg) {
 	echo "(".date('H:i:s').") Message from jtv: $msg\n";
+}
+
+function sendServer($msg){
+	fwrite($fp, $msg."\r\n");
 }
 
 ?>
